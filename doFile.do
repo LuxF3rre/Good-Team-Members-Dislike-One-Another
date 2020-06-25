@@ -142,13 +142,13 @@ keep id cog_level restrat cog1 cog2 wtc1 wtc2 gender age education experience po
 */
 
 tab cog_level restrat
-tab1 gender education experience position
+tab1 gender education position
 
 alpha cog1 cog2
 alpha wtc1 wtc2
 
-cor cog_level restrat gender education experience position, means
-collin cog_level restrat gender education experience position
+cor cog_level restrat gender education position, means
+collin cog_level restrat gender education position
 
 anova ind_cog cog_level
 est store anova1
@@ -158,19 +158,19 @@ esttab anova1 using anova1.rtf, p compress one nogap label nomtitles replace
 sum ind_cog if cog_level == 0
 sum ind_cog if cog_level == 1
 
-mixed c.wtc i.restrat i.cog_level || id:, baselevels
+mixed c.wtc i.restrat i.cog_level, baselevels vce(robust)
 est store a1
 
-mixed c.wtc i.restrat i.cog_level i.gender i.education i.experience i.position || id: , baselevels
+mixed c.wtc i.restrat i.cog_level i.gender i.education i.position, baselevels vce(robust)
 est store a3
 
-mixed c.wtc i.cog_level##i.restrat || id: , baselevels
+mixed c.wtc i.cog_level##i.restrat, baselevels vce(robust)
 est store b1
 
-mixed c.wtc i.cog_level##i.restrat i.gender i.education i.experience i.position || id: , baselevels
+mixed c.wtc i.cog_level##i.restrat i.gender i.education i.position, baselevels vce(robust)
 est store b3
 
-contrast g.cog_level##g.restrat g.gender g.education g.experience g.position
+contrast g.cog_level##g.restrat g.gender g.education g.position
 
 margins, at(cog_level = (0 1) restrat = (0 2))
 marginsplot, noci title("Willingness to Cooperate Predictive Margins") ytitle("Willingness to Cooperate")
@@ -181,19 +181,19 @@ graph export wtc2.png, replace
 
 esttab a1 b1 a3 b3 using wtc.rtf, p compress one nogap label nomtitles replace
 
-mixed c.ind_cog i.restrat i.cog_level || id :, baselevels
+mixed c.ind_cog i.restrat i.cog_level, baselevels vce(robust)
 est store a1
 
-mixed c.ind_cog i.restrat i.cog_level i.gender i.education i.experience i.position || id: , baselevels
+mixed c.ind_cog i.restrat i.cog_level i.gender i.education i.position, baselevels vce(robust)
 est store a3
 
-mixed c.ind_cog i.cog_level##i.restrat || id: , baselevels
+mixed c.ind_cog i.cog_level##i.restrat , baselevels vce(robust)
 est store b1
 
-mixed c.ind_cog i.cog_level##i.restrat i.gender i.education i.experience i.position || id: , baselevels
+mixed c.ind_cog i.cog_level##i.restrat i.gender i.education i.position , baselevels vce(robust)
 est store b3
 
-contrast g.cog_level##g.restrat g.gender g.education g.experience g.position
+contrast g.cog_level##g.restrat g.gender g.education g.position
 
 margins, at(cog_level = (0 1) restrat = (0 2))
 marginsplot, noci title("Perceived Cognitive Conflict Predictive Margins") ytitle("Perceived Cognitive Conflict")
