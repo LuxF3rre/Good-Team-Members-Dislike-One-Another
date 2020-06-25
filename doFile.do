@@ -147,13 +147,15 @@ tab1 gender education position
 alpha cog1 cog2
 alpha wtc1 wtc2
 
-cor cog_level restrat gender education position, means
-collin cog_level restrat gender education position
+ktau education position
+tab gender education, chi2
+tab gender position, chi2
+tab gender restrat, chi2
+tab experience restrat, chi2
+tab education restrat, chi2
 
 anova ind_cog cog_level
 est store anova1
-
-esttab anova1 using anova1.rtf, p compress one nogap label nomtitles replace
 
 sum ind_cog if cog_level == 0
 sum ind_cog if cog_level == 1
@@ -170,7 +172,8 @@ est store b1
 mixed c.wtc i.cog_level##i.restrat i.gender i.education i.position, baselevels vce(robust)
 est store b3
 
-contrast g.cog_level##g.restrat g.gender g.education g.position
+contrast cog_level##g.restrat gender education position
+contrast cog_level, effects
 
 margins, at(cog_level = (0 1) restrat = (0 2))
 marginsplot, noci title("Willingness to Cooperate Predictive Margins") ytitle("Willingness to Cooperate")
@@ -193,7 +196,10 @@ est store b1
 mixed c.ind_cog i.cog_level##i.restrat i.gender i.education i.position , baselevels vce(robust)
 est store b3
 
-contrast g.cog_level##g.restrat g.gender g.education g.position
+contrast cog_level##g.restrat gender education position
+contrast cog_level, effects
+contrast r.b2.education, effects mcompare(bonferroni)
+contrast restrat@cog_level, effects mcompare(bonferroni)
 
 margins, at(cog_level = (0 1) restrat = (0 2))
 marginsplot, noci title("Perceived Cognitive Conflict Predictive Margins") ytitle("Perceived Cognitive Conflict")
