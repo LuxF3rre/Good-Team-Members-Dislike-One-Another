@@ -6,16 +6,27 @@ using data.dta, clear
 
 sum wtc ind_cog cog_level education position wtc ind_cog
 tab1 cog_level restrat gender education position
-cor cog_level education position wtc ind_cog
+pwcorr cog_level education position wtc ind_cog, sig bonferroni
 
-alpha cog1 cog2
-alpha wtc1 wtc2
+pcorr cog_level education position wtc ind_cog
+pcorr education cog_level position wtc ind_cog
+pcorr position cog_level education wtc ind_cog
+pcorr wtc cog_level education position ind_cog
 
-ktau education position
+preserve
+
+duplicates drop id, force
+
+ktau education position, bonferroni
 tab gender education, chi2
 tab gender position, chi2
 tab gender restrat, chi2
 tab education restrat, chi2
+
+restore
+
+alpha cog1 cog2
+alpha wtc1 wtc2
 
 anova ind_cog cog_level
 
@@ -69,3 +80,12 @@ marginsplot, noci title("Average Marginal Effect of High Cognitive Conflict") yt
 graph export ind2.png, replace
 
 esttab rind1 rind2 rind3 rind4 using ind_cog.rtf, p compress one nogap label nomtitles replace
+
+/*
+* Additional Analysis
+*/
+
+anova wtc restrat cog_level gender education position
+anova wtc cog_level##restrat gender education position
+
+anova ind_cog cog_level##restrat gender education position
