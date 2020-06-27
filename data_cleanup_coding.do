@@ -1,4 +1,4 @@
-import delimited using D:\OneDrive\Uczelnia\RSM\Thesis\Analysis\data.csv, delimiters(";") clear
+import delimited using data.csv, delimiters(";") clear
 
 /*
 * Data cleanup and coding
