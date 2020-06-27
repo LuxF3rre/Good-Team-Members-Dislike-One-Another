@@ -82,19 +82,6 @@ replace gender = 1 if q32 == "Female"
 label define gender_label 0 "Male" 1 "Female"
 label values gender gender_label
 
-generate age = 0
-replace age = 0 if q33 == "Under 18"
-replace age = 1 if q33 == "18 - 24"
-replace age = 2 if q33 == "25 - 34"
-replace age = 3 if q33 == "35 - 44"
-replace age = 4 if q33 == "45 - 54"
-replace age = 5 if q33 == "55 - 64"
-replace age = 6 if q33 == "65 - 74"
-replace age = 7 if q33 == "75 - 84"
-replace age = 8 if q33 == "85 or older"
-label define age_label 0 "Under 18" 1 "18 - 24" 2 "25 - 34" 3 "35 - 44" 4 "45 - 54" 5 "55 - 64" 6 "65 - 74" 7 "75 - 84" 8 "85 or older"
-label values age age_label
-
 generate education = 0
 replace education = 0 if q34 == "Primary education"
 replace education = 1 if q34 == "Secondary or post-secondary education"
@@ -103,15 +90,6 @@ replace education = 3 if q34 == "Master's degree"
 replace education = 4 if q34 == "Ph.D. or higher"
 label define education_label 0 "Primary education" 1 "Secondary or post-secondary education" 2 "Bachelor's degree" 3 "Master's degree" 4 "Ph.D. or higher"
 label values education education_label
-
-generate experience = 0
-replace experience = 0 if q35 == "I do not have any professional experience"
-replace experience = 1 if q35 == "0-2 years"
-replace experience = 2 if q35 == "3-5 years"
-replace experience = 3 if q35 == "5-7 years"
-replace experience = 4 if q35 == "7 or more years"
-label define experience_label 0 "I do not have any professional experience" 1 "0-2 years" 2 "3-5 years" 3 "5-7 years" 4 "7 or more years"
-label values experience experience_label
 
 generate position = 0
 replace position = 1 if q36 == "Regular employee, specialist, or other operational roles"
@@ -129,20 +107,20 @@ generate wtc = (wtc1 + wtc2) / 2
 label variable cog_level "Cognitive Conflict Level"
 label variable ind_cog "Perceived Cognifive Conflict"
 label variable wtc "Willingness to Cooperate"
-label variable gender "Gender (female)"
+label variable gender "Gender"
 label variable education "Education Level"
-label variable experience "Years of Professional Experience"
-label variable position "Position in Company"
+label variable position "Position in a Company"
 label variable restrat "Resolution Strategy"
 
-keep id cog_level restrat cog1 cog2 wtc1 wtc2 gender age education experience position ind_cog wtc
+keep id cog_level restrat cog1 cog2 wtc1 wtc2 gender education position ind_cog wtc
 
 /*
 * Analysis
 */
 
-tab cog_level restrat
-tab1 gender education position
+sum wtc ind_cog cog_level education position wtc ind_cog
+tab1 cog_level restrat gender education position
+cor cog_level education position wtc ind_cog
 
 alpha cog1 cog2
 alpha wtc1 wtc2
@@ -151,61 +129,57 @@ ktau education position
 tab gender education, chi2
 tab gender position, chi2
 tab gender restrat, chi2
-tab experience restrat, chi2
 tab education restrat, chi2
 
 anova ind_cog cog_level
-est store anova1
 
 sum ind_cog if cog_level == 0
 sum ind_cog if cog_level == 1
 
 mixed c.wtc i.restrat i.cog_level, baselevels vce(robust)
-est store a1
-
-mixed c.wtc i.restrat i.cog_level i.gender i.education i.position, baselevels vce(robust)
-est store a3
+est store rwtc1
 
 mixed c.wtc i.cog_level##i.restrat, baselevels vce(robust)
-est store b1
+est store rwtc2
+
+mixed c.wtc i.restrat i.cog_level i.gender i.education i.position, baselevels vce(robust)
+est store rwtc3
 
 mixed c.wtc i.cog_level##i.restrat i.gender i.education i.position, baselevels vce(robust)
-est store b3
+est store rwtc4
 
-contrast cog_level##g.restrat gender education position
+contrast cog_level##restrat gender education position
 contrast cog_level, effects
+contrast restrat@cog_level, effects
+contrast restrat@cog_level, effects mcompare(bonferroni)
 
-margins, at(cog_level = (0 1) restrat = (0 2))
-marginsplot, noci title("Willingness to Cooperate Predictive Margins") ytitle("Willingness to Cooperate")
-graph export wtc1.png, replace
-margins, dydx(cog_level) at(restrat = (0 2))
-marginsplot, noci title("Average Marginal Effect of High Cognitive Conflict") ytitle("Effects on Willingness to Cooperate")
-graph export wtc2.png, replace
-
-esttab a1 b1 a3 b3 using wtc.rtf, p compress one nogap label nomtitles replace
+esttab rwtc1 rwtc2 rwtc3 rwtc4 using wtc.rtf, p compress one nogap label nomtitles replace
 
 mixed c.ind_cog i.restrat i.cog_level, baselevels vce(robust)
-est store a1
-
-mixed c.ind_cog i.restrat i.cog_level i.gender i.education i.position, baselevels vce(robust)
-est store a3
+est store ind1
 
 mixed c.ind_cog i.cog_level##i.restrat , baselevels vce(robust)
-est store b1
+est store ind2
 
-mixed c.ind_cog i.cog_level##i.restrat i.gender i.education i.position , baselevels vce(robust)
-est store b3
+mixed c.ind_cog i.restrat i.cog_level i.gender i.education i.position, baselevels vce(robust)
+est store ind3
 
-contrast cog_level##g.restrat gender education position
+mixed c.ind_cog i.cog_level##i.restrat i.gender i.education i.position, baselevels vce(robust)
+est store ind4
+
+contrast cog_level##restrat gender education position
 contrast cog_level, effects
+contrast education, effects
+contrast education, effects mcompare(bonferroni)
+contrast r.b2.education, effects
 contrast r.b2.education, effects mcompare(bonferroni)
 contrast restrat@cog_level, effects mcompare(bonferroni)
 
-margins, at(cog_level = (0 1) restrat = (0 2))
+margins, at(cog_level = (0 1) restrat = (0 2)) asbalanced
 marginsplot, noci title("Perceived Cognitive Conflict Predictive Margins") ytitle("Perceived Cognitive Conflict")
 graph export ind1.png, replace
-margins, dydx(cog_level) at(restrat = (0 2))
+margins, dydx(cog_level) at(restrat = (0 2)) asbalanced
 marginsplot, noci title("Average Marginal Effect of High Cognitive Conflict") ytitle("Effects on Perceived Cognitive Conflict")
 graph export ind2.png, replace
 
-esttab a1 b1 a3 b3 using ind_cog.rtf, p compress one nogap label nomtitles replace
+esttab ind1 ind2 ind3 ind4 using ind_cog.rtf, p compress one nogap label nomtitles replace
