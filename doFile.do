@@ -156,16 +156,16 @@ contrast restrat@cog_level, effects mcompare(bonferroni)
 esttab rwtc1 rwtc2 rwtc3 rwtc4 using wtc.rtf, p compress one nogap label nomtitles replace
 
 mixed c.ind_cog i.restrat i.cog_level, baselevels vce(robust)
-est store ind1
+est store rind1
 
 mixed c.ind_cog i.cog_level##i.restrat , baselevels vce(robust)
-est store ind2
+est store rind2
 
 mixed c.ind_cog i.restrat i.cog_level i.gender i.education i.position, baselevels vce(robust)
-est store ind3
+est store rind3
 
 mixed c.ind_cog i.cog_level##i.restrat i.gender i.education i.position, baselevels vce(robust)
-est store ind4
+est store rind4
 
 contrast cog_level##restrat gender education position
 contrast cog_level, effects
@@ -182,4 +182,4 @@ margins, dydx(cog_level) at(restrat = (0 2)) asbalanced
 marginsplot, noci title("Average Marginal Effect of High Cognitive Conflict") ytitle("Effects on Perceived Cognitive Conflict")
 graph export ind2.png, replace
 
-esttab ind1 ind2 ind3 ind4 using ind_cog.rtf, p compress one nogap label nomtitles replace
+esttab rind1 rind2 rind3 rind4 using ind_cog.rtf, p compress one nogap label nomtitles replace
