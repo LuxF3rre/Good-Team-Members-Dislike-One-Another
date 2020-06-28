@@ -29,6 +29,7 @@ alpha cog1 cog2
 alpha wtc1 wtc2
 
 anova ind_cog cog_level
+estat esize
 
 sum ind_cog if cog_level == 0
 sum ind_cog if cog_level == 1
@@ -50,7 +51,7 @@ contrast cog_level, effects
 contrast restrat@cog_level, effects
 contrast restrat@cog_level, effects mcompare(bonferroni)
 
-esttab rwtc1 rwtc2 rwtc3 rwtc4 using wtc.rtf, p compress one nogap label nomtitles replace
+// esttab rwtc1 rwtc2 rwtc3 rwtc4 using wtc.rtf, p compress one nogap label nomtitles replace
 
 mixed c.ind_cog i.restrat i.cog_level, baselevels vce(robust)
 est store rind1
@@ -74,18 +75,22 @@ contrast restrat@cog_level, effects mcompare(bonferroni)
 
 margins, at(cog_level = (0 1) restrat = (0 2)) asbalanced
 marginsplot, noci title("Perceived Cognitive Conflict Predictive Margins") ytitle("Perceived Cognitive Conflict")
-graph export ind1.png, replace
+// graph export ind1.png, replace
 margins, dydx(cog_level) at(restrat = (0 2)) asbalanced
 marginsplot, noci title("Average Marginal Effect of High Cognitive Conflict") ytitle("Effects on Perceived Cognitive Conflict")
-graph export ind2.png, replace
+// graph export ind2.png, replace
 
-esttab rind1 rind2 rind3 rind4 using ind_cog.rtf, p compress one nogap label nomtitles replace
+// esttab rind1 rind2 rind3 rind4 using ind_cog.rtf, p compress one nogap label nomtitles replace
 
 /*
 * Additional Analysis
 */
 
 anova wtc restrat cog_level gender education position
+estat esize
+
 anova wtc cog_level##restrat gender education position
+estat esize
 
 anova ind_cog cog_level##restrat gender education position
+estat esize
